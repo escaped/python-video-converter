@@ -434,7 +434,6 @@ class FFMpeg(object):
         except OSError:
             raise FFMpegError('Error while calling ffmpeg binary')
 
-        yielded = False
         buf = ''
         total_output = ''
         pat = re.compile(r'time=([0-9.:]+) ')
@@ -465,7 +464,6 @@ class FFMpeg(object):
                             timecode = 60 * timecode + float(part)
                     else:
                         timecode = float(tmp[0])
-                    yielded = True
                     yield timecode
 
         if timeout:
@@ -490,9 +488,6 @@ class FFMpeg(object):
             if line.startswith('Error while '):
                 raise FFMpegConvertError('Encoding error', cmd, total_output,
                                          line, pid=p.pid)
-            if not yielded:
-                raise FFMpegConvertError('Unknown ffmpeg error', cmd,
-                                         total_output, line, pid=p.pid)
         if p.returncode != 0:
             raise FFMpegConvertError('Exited with code %d' % p.returncode, cmd,
                                      total_output, pid=p.pid)
